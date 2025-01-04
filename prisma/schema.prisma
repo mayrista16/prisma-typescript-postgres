@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id        Int              @id @default(autoincrement())
+  email     String           @unique
+  username  String           @unique
+  password  String
+  role      Role             @default(USER)
+  addresses user_addresses[] @relation("UserAddresses")
+  car       user_car[]       @relation("UsersCarfk")
+}
+
+model user_addresses {
+  id       Int    @id @default(autoincrement())
+  address  String
+  rt       Int
+  rw       Int
+  district String
+  city     String
+  province String
+  userId   Int
+  user     users  @relation("UserAddresses", fields: [userId], references: [id])
+}
+
+model cars {
+  id           Int        @id @default(autoincrement())
+  name         String
+  brand        String
+  release_year Int
+  plate_number String     @unique
+  status       String
+  user_car     user_car[] @relation("UserCarsfk")
+}
+
+model user_car {
+  id       Int        @id @default(autoincrement())
+  carId    Int
+  userId   Int
+  user     users      @relation("UsersCarfk", fields: [userId], references: [id])
+  car      cars       @relation("UserCarsfk", fields: [carId], references: [id])
+  location location[] @relation("UserCarLocationfk")
+}
+
+model location {
+  id         Int      @id @default(autoincrement())
+  location   String
+  user_carId Int
+  userCar    user_car @relation("UserCarLocationfk", fields: [user_carId], references: [id])
+}
+
+enum Role {
+  USER
+  ADMIN
+  SUPERADMIN
+}

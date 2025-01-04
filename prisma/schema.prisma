@@ -19,8 +19,8 @@ model users {
   username  String           @unique
   password  String
   role      Role             @default(USER)
-  addresses user_addresses[] @relation("UserAddresses")
-  car       user_car[]       @relation("UsersCarfk")
+  addresses user_addresses[] @relation("Address")
+  car       user_car[]       @relation("User")
 }
 
 model user_addresses {
@@ -32,7 +32,7 @@ model user_addresses {
   city     String
   province String
   userId   Int
-  user     users  @relation("UserAddresses", fields: [userId], references: [id])
+  user     users  @relation("Address", fields: [userId], references: [id])
 }
 
 model cars {
@@ -42,23 +42,23 @@ model cars {
   release_year Int
   plate_number String     @unique
   status       String
-  user_car     user_car[] @relation("UserCarsfk")
+  user_car     user_car[] @relation("Car")
 }
 
 model user_car {
   id       Int        @id @default(autoincrement())
   carId    Int
   userId   Int
-  user     users      @relation("UsersCarfk", fields: [userId], references: [id])
-  car      cars       @relation("UserCarsfk", fields: [carId], references: [id])
-  location location[] @relation("UserCarLocationfk")
+  user     users      @relation("User", fields: [userId], references: [id])
+  car      cars       @relation("Car", fields: [carId], references: [id])
+  location location[] @relation("Locations")
 }
 
 model location {
   id         Int      @id @default(autoincrement())
   location   String
   user_carId Int
-  userCar    user_car @relation("UserCarLocationfk", fields: [user_carId], references: [id])
+  userCar    user_car @relation("Locations", fields: [user_carId], references: [id])
 }
 
 enum Role {

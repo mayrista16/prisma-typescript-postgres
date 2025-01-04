@@ -13,17 +13,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model users {
+model User {
+  @@map("users")
+
   id        Int              @id @default(autoincrement())
   email     String           @unique
   username  String           @unique
   password  String
   role      Role             @default(USER)
-  addresses user_addresses[] @relation("Address")
-  car       user_car[]       @relation("User")
+  addresses UserAddress[] @relation("Address")
+  car       UserCar[]       @relation("User")
 }
 
-model user_addresses {
+model UserAddress {
+  @@map("user_addresses")
+
   id       Int    @id @default(autoincrement())
   address  String
   rt       Int
@@ -32,33 +36,39 @@ model user_addresses {
   city     String
   province String
   userId   Int
-  user     users  @relation("Address", fields: [userId], references: [id])
+  user     User  @relation("Address", fields: [userId], references: [id])
 }
 
-model cars {
+model Car {
+  @@map("cars")
+
   id           Int        @id @default(autoincrement())
   name         String
   brand        String
   release_year Int
   plate_number String     @unique
   status       String
-  user_car     user_car[] @relation("Car")
+  user_car     UserCar[] @relation("Car")
 }
 
-model user_car {
+model UserCar {
+  @@map("user_cars")
+
   id       Int        @id @default(autoincrement())
   carId    Int
   userId   Int
-  user     users      @relation("User", fields: [userId], references: [id])
-  car      cars       @relation("Car", fields: [carId], references: [id])
-  location location[] @relation("Locations")
+  user     User      @relation("User", fields: [userId], references: [id])
+  car      Car       @relation("Car", fields: [carId], references: [id])
+  location Location[] @relation("Locations")
 }
 
-model location {
+model Location {
+  @@map("locations")
+
   id         Int      @id @default(autoincrement())
   location   String
   user_carId Int
-  userCar    user_car @relation("Locations", fields: [user_carId], references: [id])
+  userCar    UserCar @relation("Locations", fields: [user_carId], references: [id])
 }
 
 enum Role {
